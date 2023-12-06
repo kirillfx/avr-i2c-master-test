@@ -18,8 +18,11 @@ embedded-hal = "0.2.3"
 
 [dependencies.arduino-hal]
 git = "https://github.com/rahix/avr-hal"
-rev = "190f2c3cb8d29e10f71119352b912369dc5a1fb7"
+rev = "1a0040dc07d37054ccaa93d43a9d2db5f46da3b2"
 features = ["arduino-nano"]
+
+[dependencies.avr-device]
+version = "0.5.3"
 
 # Configure the build for minimal size - AVRs have very little program memory
 [profile.dev]
