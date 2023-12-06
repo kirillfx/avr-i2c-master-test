@@ -39,7 +39,7 @@ fn main() -> ! {
 
     let mut led = pins.d13.into_output();
 
-    let mut btn_pin = pins.d2.into_output_high();
+    let btn_pin = pins.d2.into_pull_up_input();
 
     dp.EXINT.eicra.modify(|_, w| w.isc0().bits(0x03));
     dp.EXINT.eimsk.modify(|_, w| w.int0().set_bit());
@@ -78,7 +78,7 @@ fn main() -> ! {
             BTN_FLAG.store(false, Ordering::SeqCst);
 
             uwriteln!(&mut serial, "Writing to i2c at {}", addr).unwrap();
-            let b: [u8; 1] = [124];
+            let b = [207, 206];
             if let Err(err) = i2c.write(addr, &b) {
                 uwriteln!(&mut serial, "I2C error: {:?}", err as I2CError).unwrap();
             };
