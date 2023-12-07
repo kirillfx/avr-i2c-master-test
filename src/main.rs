@@ -8,7 +8,7 @@ use arduino_hal::prelude::*;
 // use embedded_hal::blocking::i2c::Write;
 use arduino_hal::i2c::Error as I2CError;
 use panic_halt as _;
-use ufmt::uwriteln;
+use ufmt::{uwrite, uwriteln};
 
 static BTN_FLAG: AtomicBool = AtomicBool::new(false);
 
@@ -49,22 +49,57 @@ fn main() -> ! {
 
     uwriteln!(&mut serial, "Initialized").unwrap();
 
-    uwriteln!(&mut serial, "Devices to write to:").unwrap();
-    let _ = i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Write);
+    // uwriteln!(&mut serial, "Devices to write to:").unwrap();
+    // let _ = i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Write);
 
-    uwriteln!(&mut serial, "Devices to read from:").unwrap();
-    let _ = i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Read);
+    // uwriteln!(&mut serial, "Devices to read from:").unwrap();
+    // let _ = i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Read);
 
     loop {
+        // if BTN_FLAG.load(Ordering::SeqCst) {
+        //     led.set_high();
+
+        //     uwriteln!(&mut serial, "Writing to i2c address: 0x{:X}", addr).unwrap();
+        //     let b = [207, 206];
+        //     match i2c.write(addr, &b) {
+        //         Err(err) => uwriteln!(&mut serial, "I2C error: {:?}", err as I2CError).unwrap(),
+        //         Ok(_) => uwriteln!(&mut serial, "Done\n").unwrap(),
+        //     };
+
+        //     led.set_low();
+        //     BTN_FLAG.store(false, Ordering::SeqCst);
+        // }
+
         if BTN_FLAG.load(Ordering::SeqCst) {
             led.set_high();
 
+            // WRITE
             uwriteln!(&mut serial, "Writing to i2c address: 0x{:X}", addr).unwrap();
-            let b = [207, 206];
+            let b = [1, 2, 3, 4];
+            uwrite!(&mut serial, "Sending: ").unwrap();
+            b.iter().for_each(|b| {
+                uwrite!(&mut serial, "{} ", b).unwrap();
+            });
+            uwrite!(&mut serial, "\n").unwrap();
             match i2c.write(addr, &b) {
                 Err(err) => uwriteln!(&mut serial, "I2C error: {:?}", err as I2CError).unwrap(),
                 Ok(_) => uwriteln!(&mut serial, "Done\n").unwrap(),
             };
+
+            arduino_hal::delay_ms(500);
+
+            // READ
+            let mut read_buf: [u8; 3] = [0u8; 3];
+            match i2c.read(addr, &mut read_buf) {
+                Ok(_) => {
+                    uwrite!(&mut serial, "Received: ").unwrap();
+                    read_buf.iter().for_each(|b| {
+                        uwrite!(&mut serial, "{} ", b).unwrap();
+                    });
+                    uwrite!(&mut serial, "\n").unwrap();
+                }
+                Err(err) => uwriteln!(&mut serial, "I2C error: {:?}", err as I2CError).unwrap(),
+            }
 
             led.set_low();
             BTN_FLAG.store(false, Ordering::SeqCst);
