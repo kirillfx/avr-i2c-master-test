@@ -49,7 +49,10 @@ fn main() -> ! {
 
     uwriteln!(&mut serial, "Initialized").unwrap();
 
+    uwriteln!(&mut serial, "Devices to write to:").unwrap();
     let _ = i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Write);
+
+    uwriteln!(&mut serial, "Devices to read from:").unwrap();
     let _ = i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Read);
 
     loop {
