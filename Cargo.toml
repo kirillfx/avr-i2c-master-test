@@ -1,12 +1,12 @@
 [package]
-name = "i2c-master-test"
+name = "avr-i2c-master-test"
 version = "0.1.0"
 authors = ["Kirill Chayka <kirillfx@gmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [[bin]]
-name = "i2c-master-test"
+name = "avr-i2c-master-test"
 test = false
 bench = false
 
