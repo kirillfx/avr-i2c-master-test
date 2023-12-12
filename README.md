@@ -8,7 +8,7 @@ To trigger i2c transactions interruption is used. I2C used an external pullup re
 ]
 ## Build Instructions
 
-- Specify `RAVEDUDE_PORT` in `.envrc` if direnv is used. If you on linux with nix, change env var in `flake.nix`
+- Specify `RAVEDUDE_PORT` in `.envrc` if direnv is used. If you're on linux with nix, change env var in `flake.nix`
 
 - Install prerequisites as described in the [`avr-hal` README] (`avr-gcc`, `avr-libc`, `avrdude`, [`ravedude`]).
 
