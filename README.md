@@ -1,18 +1,24 @@
 i2c-master-test
 ===============
 
-Rust project for the _Arduino Nano_.
+Rust project for the _Arduino Nano_ used as i2c master to test [i2c slave implementation](https://github.com/kirillfx/avr-i2c-slave).
 
+To trigger i2c transactions interruption is used. I2C used an external pullup resistors.
+
+]
 ## Build Instructions
-1. Install prerequisites as described in the [`avr-hal` README] (`avr-gcc`, `avr-libc`, `avrdude`, [`ravedude`]).
 
-2. Run `cargo build` to build the firmware.
+- Specify `RAVEDUDE_PORT` in `.envrc` if direnv is used. If you on linux with nix, change env var in `flake.nix`
 
-3. Run `cargo run` to flash the firmware to a connected board.  If `ravedude`
+- Install prerequisites as described in the [`avr-hal` README] (`avr-gcc`, `avr-libc`, `avrdude`, [`ravedude`]).
+
+- Run `cargo build` to build the firmware.
+
+- Run `cargo run` to flash the firmware to a connected board.  If `ravedude`
    fails to detect your board, check its documentation at
    <https://crates.io/crates/ravedude>.
 
-4. `ravedude` will open a console session after flashing where you can interact
+- `ravedude` will open a console session after flashing where you can interact
    with the UART console of your board.
 
 [`avr-hal` README]: https://github.com/Rahix/avr-hal#readme
