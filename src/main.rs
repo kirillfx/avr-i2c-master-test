@@ -4,9 +4,8 @@
 
 use core::sync::atomic::{AtomicBool, Ordering};
 
-use arduino_hal::prelude::*;
-// use embedded_hal::blocking::i2c::Write;
 use arduino_hal::i2c::Error as I2CError;
+use arduino_hal::prelude::*;
 use panic_halt as _;
 use ufmt::{uwrite, uwriteln};
 
@@ -44,7 +43,8 @@ fn main() -> ! {
         100000,
     );
 
-    let addr: u8 = 0x26;
+    let slave_address: u8 = 0x26;
+    // GCA (Global Call Address)
     let global_addr: u8 = 0x00;
 
     uwriteln!(&mut serial, "Initialized").unwrap();
@@ -56,41 +56,30 @@ fn main() -> ! {
     // let _ = i2c.i2cdetect(&mut serial, arduino_hal::i2c::Direction::Read);
 
     loop {
-        // if BTN_FLAG.load(Ordering::SeqCst) {
-        //     led.set_high();
-
-        //     uwriteln!(&mut serial, "Writing to i2c address: 0x{:X}", addr).unwrap();
-        //     let b = [207, 206];
-        //     match i2c.write(addr, &b) {
-        //         Err(err) => uwriteln!(&mut serial, "I2C error: {:?}", err as I2CError).unwrap(),
-        //         Ok(_) => uwriteln!(&mut serial, "Done\n").unwrap(),
-        //     };
-
-        //     led.set_low();
-        //     BTN_FLAG.store(false, Ordering::SeqCst);
-        // }
-
         if BTN_FLAG.load(Ordering::SeqCst) {
             led.set_high();
 
             // WRITE
-            uwriteln!(&mut serial, "Writing to i2c address: 0x{:X}", addr).unwrap();
+            uwriteln!(&mut serial, "Writing to i2c address: 0x{:X}", slave_address).unwrap();
             let b = [1, 2, 3, 4];
             uwrite!(&mut serial, "Sending: ").unwrap();
             b.iter().for_each(|b| {
                 uwrite!(&mut serial, "{} ", b).unwrap();
             });
+
             uwrite!(&mut serial, "\n").unwrap();
-            match i2c.write(addr, &b) {
+
+            match i2c.write(slave_address, &b) {
                 Err(err) => uwriteln!(&mut serial, "I2C error: {:?}", err as I2CError).unwrap(),
-                Ok(_) => uwriteln!(&mut serial, "Done\n").unwrap(),
+                Ok(_) => uwriteln!(&mut serial, "Data has been sent").unwrap(),
             };
 
-            arduino_hal::delay_ms(500);
+            arduino_hal::delay_ms(100);
 
             // READ
-            let mut read_buf: [u8; 3] = [0u8; 3];
-            match i2c.read(addr, &mut read_buf) {
+            // Expect back only 2 bytes just to see how slave handles Stop condition
+            let mut read_buf: [u8; 2] = [0u8; 2];
+            match i2c.read(slave_address, &mut read_buf) {
                 Ok(_) => {
                     uwrite!(&mut serial, "Received: ").unwrap();
                     read_buf.iter().for_each(|b| {
@@ -101,22 +90,10 @@ fn main() -> ! {
                 Err(err) => uwriteln!(&mut serial, "I2C error: {:?}", err as I2CError).unwrap(),
             }
 
+            uwriteln!(&mut serial, "\n\n").unwrap();
+
             led.set_low();
             BTN_FLAG.store(false, Ordering::SeqCst);
         }
-
-        // {
-        //     uwriteln!(&mut serial, "Writing to i2c at {}", global_addr).unwrap();
-        //     let b: [u8; 1] = [124];
-        //     if let Err(err) = i2c.write(global_addr, &b) {
-        //         uwriteln!(&mut serial, "I2C error: {:?}", err as I2CError).unwrap();
-        //     };
-        // }
-        // if let Err(err) = i2c.read(0x0f, &mut b) {
-        //     uwriteln!(&mut serial, "I2C error: {:?}", err as I2CError).unwrap();
-        // };
-
-        // led.set_low();
-        // arduino_hal::delay_ms(1000);
     }
 }
